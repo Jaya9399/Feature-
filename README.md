@@ -28,7 +28,7 @@ Once you've cloned the repository, navigate to the project directory and install
 
 #### Using `pip` (Python)
 
-```bash
+
 # Create a virtual environment (optional but recommended)
 python3 -m venv venv
 source venv/bin/activate  # For Linux/macOS
@@ -40,15 +40,17 @@ pip install -r requirements.txt
 
 ### All the steps after creating all the files and uploading it you will see
 here is the image demonstrating App interface
+![Alt text](images/1.png)
+![Alt text](images/2.png)
+![Alt text](images/3.png)
+![Alt text](images/after clicking delete.png)
+![Alt text](images/after clicking ok after deleted.png)
+![Alt text](images/deleted.png)
 
-
-
-Running the Project
+#### Running the Project
 1. Start the Backend (API Server)
 To start the backend API server, run the following command:
-bash
-Copy
-Edit
+
 python backend.py
 The server will start, and you'll be able to test the feature flag endpoints via Postman or another API testing tool at http://127.0.0.1:5000.
 2. Start the Frontend
@@ -62,38 +64,26 @@ Parameters:
 feature_name: The name of the feature flag (e.g., darkMode).
 user_id: The user ID for whom to check the feature flag state.
 Example Request:
-http
-Copy
-Edit
 GET http://127.0.0.1:5000/feature-flags/darkMode/12345
 POST /feature-flags/{feature_name}
 Description: Create or update a feature flag.
 Request Body:
 json
-Copy
-Edit
+
 {
   "enabled": true,
   "environment": "production"
 }
 Example Request:
 http
-Copy
-Edit
 POST http://127.0.0.1:5000/feature-flags/darkMode
 GET /feature-flags
 Description: Lists all feature flags with their current values and environments.
 Example Request:
-http
-Copy
-Edit
 GET http://127.0.0.1:5000/feature-flags
 PUT /feature-flags/{feature_name}/toggle
 Description: Toggle the feature flag value between true and false for all users in a specific environment.
 Example Request:
-http
-Copy
-Edit
 PUT http://127.0.0.1:5000/feature-flags/darkMode/toggle
 Postman API Testing
 You can use Postman to test the API endpoints. Here's how to set it up:
@@ -110,6 +100,9 @@ Enter the endpoint URL http://127.0.0.1:5000/feature-flags/darkMode.
 Set the body to JSON format:
 json
 Copy
+
+
+
 Edit
 {
   "enabled": true,
