@@ -41,3 +41,83 @@ pip install -r requirements.txt
 ### All the steps after creating all the files and uploading it you will see
 here is the image demonstrating App interface
 
+
+
+Running the Project
+1. Start the Backend (API Server)
+To start the backend API server, run the following command:
+bash
+Copy
+Edit
+python backend.py
+The server will start, and you'll be able to test the feature flag endpoints via Postman or another API testing tool at http://127.0.0.1:5000.
+2. Start the Frontend
+Open the index.html file in your web browser to view and manage the feature flags.
+API Endpoints
+Here is a list of available API endpoints to interact with the feature flags:
+
+GET /feature-flags/{feature_name}/{user_id}
+Description: Returns the flag state (true/false or a variant) for a specific user.
+Parameters:
+feature_name: The name of the feature flag (e.g., darkMode).
+user_id: The user ID for whom to check the feature flag state.
+Example Request:
+http
+Copy
+Edit
+GET http://127.0.0.1:5000/feature-flags/darkMode/12345
+POST /feature-flags/{feature_name}
+Description: Create or update a feature flag.
+Request Body:
+json
+Copy
+Edit
+{
+  "enabled": true,
+  "environment": "production"
+}
+Example Request:
+http
+Copy
+Edit
+POST http://127.0.0.1:5000/feature-flags/darkMode
+GET /feature-flags
+Description: Lists all feature flags with their current values and environments.
+Example Request:
+http
+Copy
+Edit
+GET http://127.0.0.1:5000/feature-flags
+PUT /feature-flags/{feature_name}/toggle
+Description: Toggle the feature flag value between true and false for all users in a specific environment.
+Example Request:
+http
+Copy
+Edit
+PUT http://127.0.0.1:5000/feature-flags/darkMode/toggle
+Postman API Testing
+You can use Postman to test the API endpoints. Here's how to set it up:
+
+GET /feature-flags/{feature_name}/{user_id}:
+
+Set the method to GET in Postman.
+Enter the endpoint URL http://127.0.0.1:5000/feature-flags/darkMode/12345.
+Click Send to see the response.
+POST /feature-flags/{feature_name}:
+
+Set the method to POST in Postman.
+Enter the endpoint URL http://127.0.0.1:5000/feature-flags/darkMode.
+Set the body to JSON format:
+json
+Copy
+Edit
+{
+  "enabled": true,
+  "environment": "production"
+}
+Click Send to create or update the feature flag.
+PUT /feature-flags/{feature_name}/toggle:
+
+Set the method to PUT in Postman.
+Enter the endpoint URL http://127.0.0.1:5000/feature-flags/darkMode/toggle.
+Click Send to toggle the feature flag.
