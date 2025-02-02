@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Flags Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        .enabled {
+            background-color: #d4edda; /* Light green for enabled */
+            color: #155724;
+        }
+
+        .disabled {
+            background-color: #f8d7da; /* Light red for disabled */
+            color: #721c24;
+        }
+
+        /* Adding some styling for the buttons */
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Feature Flags Management</h2>
+
+        <h3>Feature Flags List</h3>
+        <button class="btn-primary" onclick="fetchFeatureFlags()">Load Feature Flags</button>
+        <table id="flagsTable">
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </table>
+
+        <h3>Create New Feature Flag</h3>
+        <div>
+            <input type="text" id="flagName" placeholder="Enter Feature Name">
+            <select id="flagStatus">
+                <option value="true">Enabled</option>
+                <option value="false">Disabled</option>
+            </select>
+            <button class="btn-primary" onclick="createFeatureFlag()">Create Flag</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:5000";
+
+        // Fetch All Feature Flags
+        function fetchFeatureFlags() {
+            fetch(`${API_URL}/feature-flags`)
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById("flagsTable");
+                    table.innerHTML = "<tr><th>Name</th><th>Status</th><th>Actions</th></tr>"; // Clear the table before adding new rows
+
+                    data.forEach(flag => {
+                        const row = table.insertRow();
+                        row.insertCell(0).innerText = flag.name;
+                        row.insertCell(1).innerText = flag.enabled ? "Enabled" : "Disabled";
+
+                        // Add a class based on flag status
+                        row.className = flag.enabled ? 'enabled' : 'disabled';
+
+                        // Create "Toggle" Button
+                        const toggleBtn = document.createElement("button");
+                        toggleBtn.className = 'btn-secondary';
+                        toggleBtn.innerText = "Toggle";
+                        toggleBtn.onclick = () => toggleFeatureFlag(flag.name);
+                        row.insertCell(2).appendChild(toggleBtn);
+
+                        // Create "Edit" Button
+                        const editBtn = document.createElement("button");
+                        editBtn.className = 'btn-primary';
+                        editBtn.innerText = "Edit";
+                        editBtn.onclick = () => editFeatureFlag(flag);
+                        row.insertCell(2).appendChild(editBtn);
+
+                        // Create "Delete" Button
+                        const deleteBtn = document.createElement("button");
+                        deleteBtn.className = 'btn-danger';
+                        deleteBtn.innerText = "Delete";
+                        deleteBtn.onclick = () => deleteFeatureFlag(flag.name);
+                        row.insertCell(2).appendChild(deleteBtn);
+                    });
+                });
+        }
+
+        // Create a Feature Flag with Validation
+        function createFeatureFlag() {
+            const name = document.getElementById("flagName").value;
+            const enabled = document.getElementById("flagStatus").value === "true";
+
+            // Check if the name is empty
+            if (!name.trim()) {
+                alert("Feature Name is required!");
+                return; // Prevent creating the flag if the name is empty
+            }
+
+            fetch(`${API_URL}/feature-flags`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, enabled, environment: "production" })
+            })
+                .then(response => response.json())
+                .then(() => {
+                    alert(`Feature flag '${name}' created!`);
+                    fetchFeatureFlags(); // Refresh the list
+                });
+        }
+
+        // Toggle a Feature Flag
+        function toggleFeatureFlag(name) {
+            fetch(`${API_URL}/feature-flags/${name}/toggle`, { method: "PUT" })
+                .then(response => response.json())
+                .then(() => {
+                    alert(`Feature flag '${name}' toggled!`);
+                    fetchFeatureFlags(); // Refresh the list
+                });
+        }
+
+        // Edit a Feature Flag
+        function editFeatureFlag(flag) {
+            const newName = prompt("Enter new name for the flag", flag.name);
+            if (newName) {
+                fetch(`${API_URL}/feature-flags/${flag.name}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: newName, enabled: flag.enabled, environment: "production" })
+                })
+                .then(response => response.json())
+                .then(() => {
+                    alert(`Feature flag '${flag.name}' updated to '${newName}'!`);
+                    fetchFeatureFlags(); // Refresh the list
+                });
+            }
+        }
+
+        // Delete a Feature Flag
+        function deleteFeatureFlag(name) {
+            const confirmDelete = confirm(`Are you sure you want to delete the feature flag '${name}'?`);
+            if (confirmDelete) {
+                fetch(`${API_URL}/feature-flags/${name}`, { method: "DELETE" })
+                    .then(response => response.json())
+                    .then(() => {
+                        alert(`Feature flag '${name}' deleted!`);
+                        fetchFeatureFlags(); // Refresh the list
+                    });
+            }
+        }
+    </script>
+
+</body>
+
+</html>
